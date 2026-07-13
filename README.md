@@ -2,7 +2,7 @@
 
 React Native + Expo app for **Nur** (نور = "Light"), a Quranic wellbeing check-in app that reads a user's emotional state and recommends relevant Quran verses with personalized context.
 
-Backend: [nur-backend](https://github.com/Tarambulog/nur-backend)
+Backend: [nur-backend](https://github.com/yujikarlyoshida/nur-backend)
 
 ## Stack
 
@@ -34,4 +34,4 @@ npm install
 npx expo start        # or: npm run ios / npm run android / npm run web
 ```
 
-Requires the [nur-backend](https://github.com/Tarambulog/nur-backend) API running locally on port 3000 (the app's `api.ts` service defaults to `http://localhost:3000`).
+Requires the [nur-backend](https://github.com/yujikarlyoshida/nur-backend) API running locally on port 3000 (the app's `api.ts` service defaults to `http://localhost:3000`).
