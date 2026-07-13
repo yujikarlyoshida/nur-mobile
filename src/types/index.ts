@@ -1,0 +1,91 @@
+export type EmotionState =
+  | 'anxiety'
+  | 'sadness'
+  | 'anger'
+  | 'loneliness'
+  | 'gratitude'
+  | 'hope'
+  | 'guilt'
+  | 'confusion'
+  | 'peace'
+  | 'overwhelmed'
+  | 'grief'
+  | 'disconnection'
+  | 'joy';
+
+export interface EmotionalProfile {
+  primary_emotion: EmotionState;
+  intensity: number; // 1-10
+  spiritual_need: string;
+  life_domain: string;
+  themes: string[];
+  reasoning: string;
+  crisis?: boolean;
+}
+
+export interface VerseRecommendation {
+  verse_key: string;
+  surah_number: number;
+  ayah_number: number;
+  arabic_text: string;
+  translation: string;
+  transliteration?: string;
+  personalized_note: string;
+  relevance_score: number;
+  tafsir_summary?: string;
+  surah_name?: string;
+  audio_url?: string;
+}
+
+export interface CheckinRequest {
+  text?: string;
+  emotion?: EmotionState;
+  language?: string;
+  translation_preference?: string;
+}
+
+export interface CheckinResponse {
+  checkin_id: string;
+  emotional_profile: EmotionalProfile;
+  recommendations: VerseRecommendation[];
+  crisis_resources?: {
+    message: string;
+    hotlines: Array<{ name: string; number: string; url?: string }>;
+  };
+}
+
+export interface SavedVerse {
+  verse_key: string;
+  arabic_text: string;
+  translation: string;
+  saved_at: string;
+  personal_note?: string;
+  surah_name?: string;
+  surah_number?: number;
+  ayah_number?: number;
+}
+
+export interface JournalEntry {
+  id: string;
+  date: string;
+  emotion: EmotionState;
+  intensity: number;
+  text_input?: string;
+  verses_received: number;
+  checkin_id: string;
+}
+
+export interface UserProfile {
+  name?: string;
+  language: 'en' | 'ar' | 'ur' | 'ms';
+  translation: string;
+  notifications_enabled: boolean;
+  onboarding_complete: boolean;
+}
+
+export interface SurahInfo {
+  id: number;
+  name_simple: string;
+  name_arabic: string;
+  verses_count: number;
+}
