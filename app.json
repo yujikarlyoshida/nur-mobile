@@ -45,7 +45,9 @@
     ],
     "extra": {
       "apiBaseUrl": "http://localhost:3000",
-      "supportsRTL": true
+      "supportsRTL": true,
+      "supabaseUrl": "",
+      "supabaseAnonKey": ""
     }
   }
 }

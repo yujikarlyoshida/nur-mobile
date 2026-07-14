@@ -10,6 +10,8 @@ Backend: [nur-backend](https://github.com/yujikarlyoshida/nur-backend)
 - **React Navigation** (bottom tabs + native stack)
 - **Axios** for API calls, **AsyncStorage** for local persistence
 - **expo-av** for audio playback, **expo-secure-store** for secure storage
+- **Supabase Auth** for optional cross-device sync (opt-in — the app is fully usable local-only without it)
+- **GitHub Actions** for CI (typecheck + web export build check), **Vercel** for web hosting
 
 ## Screens
 
@@ -18,6 +20,7 @@ Backend: [nur-backend](https://github.com/yujikarlyoshida/nur-backend)
 - **Verse Discovery** — personalized verse recommendations from a check-in
 - **Verse Detail** — Arabic text, translation, and tafsir summary for a single verse
 - **Journal** — history of past check-ins and saved verses
+- **Sign In** — optional account creation for cross-device sync (reachable from Profile → Account)
 - **Profile** — user settings
 
 ## Design
@@ -31,7 +34,23 @@ Backend: [nur-backend](https://github.com/yujikarlyoshida/nur-backend)
 
 ```bash
 npm install
+npm run type-check
 npx expo start        # or: npm run ios / npm run android / npm run web
 ```
 
 Requires the [nur-backend](https://github.com/yujikarlyoshida/nur-backend) API running locally on port 3000 (the app's `api.ts` service defaults to `http://localhost:3000`).
+
+### Web build & deployment
+
+```bash
+npm run build:web     # exports a static site to dist/ via Expo's web export
+```
+
+`vercel.json` is already set up — running `vercel` (or `vercel --prod`) from this directory deploys the web build with no extra config. This gives you a clickable link to the app that doesn't require an App Store install.
+
+### Optional: cross-device sync (Supabase Auth)
+
+The app works fully offline, no account needed, by default. To turn on optional sign-in and cross-device sync:
+
+1. Set `supabaseUrl` / `supabaseAnonKey` in `app.json` under `expo.extra` (same Supabase project as the backend — its RLS policies in `db/schema.sql` were already written for this).
+2. That's it — the "Sign In / Sync Account" row appears under Profile → Account automatically once configured (see `src/services/supabaseClient.ts`).

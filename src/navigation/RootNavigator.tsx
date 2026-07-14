@@ -14,6 +14,7 @@ import VerseDiscoveryScreen from '../screens/VerseDiscoveryScreen';
 import VerseDetailScreen from '../screens/VerseDetailScreen';
 import JournalScreen from '../screens/JournalScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import SignInScreen from '../screens/SignInScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -92,6 +93,11 @@ export function RootNavigator({ showOnboarding }: RootNavigatorProps) {
       >
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="MainTabs" component={MainTabs} />
+        <Stack.Screen
+          name="SignIn"
+          component={SignInScreen}
+          options={{ animation: 'slide_from_bottom' }}
+        />
         <Stack.Screen
           name="VerseDetail"
           component={VerseDetailScreen}

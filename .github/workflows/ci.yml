@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Typecheck + web export
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run type-check
+
+      # Building the Expo web export is a cheap, reliable stand-in for a
+      # full test suite on a React Native project: it exercises the entire
+      # dependency graph and catches import/config errors across all
+      # screens, not just whatever a hand-picked unit test touches.
+      - name: Build web export
+        run: npm run build:web

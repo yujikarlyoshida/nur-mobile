@@ -11,11 +11,16 @@ import {
   Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { getUserProfile, updateUserProfile, deleteAllUserData } from '../services/storage';
+import { isAuthAvailable, getCurrentUser, signOut } from '../services/auth';
 import { UserProfile } from '../types';
+import { RootStackParamList } from '../navigation/types';
 import { Colors, Typography, Spacing, BorderRadius, Shadows } from '../constants/theme';
+
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 const APP_VERSION = '1.0.0';
 
@@ -86,20 +91,43 @@ const SettingsRow: React.FC<SettingsRowProps> = ({
 );
 
 export default function ProfileScreen() {
+  const navigation = useNavigation<Nav>();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
   const [showTranslationPicker, setShowTranslationPicker] = useState(false);
+  const [accountEmail, setAccountEmail] = useState<string | null>(null);
 
   const loadProfile = useCallback(async () => {
     const p = await getUserProfile();
     setProfile(p);
   }, []);
 
+  const loadAccount = useCallback(async () => {
+    if (!isAuthAvailable()) return;
+    const user = await getCurrentUser();
+    setAccountEmail(user?.email ?? null);
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
       loadProfile();
-    }, [loadProfile])
+      loadAccount();
+    }, [loadProfile, loadAccount])
   );
+
+  const handleSignOut = () => {
+    Alert.alert('Sign Out', 'You can sign back in any time — your data on this device is unaffected.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: async () => {
+          await signOut();
+          setAccountEmail(null);
+        },
+      },
+    ]);
+  };
 
   const handleNotificationsToggle = async (value: boolean) => {
     await updateUserProfile({ notifications_enabled: value });
@@ -158,6 +186,27 @@ export default function ProfileScreen() {
           </View>
           <Text style={styles.profileName}>{profile?.name || 'Dear Friend'}</Text>
           <Text style={styles.profileTagline}>Nur - Quranic Wellbeing</Text>
+        </View>
+
+        {/* Account (optional cloud sync) */}
+        <SectionHeader title="Account" icon="cloud-outline" />
+        <View style={styles.card}>
+          {accountEmail ? (
+            <SettingsRow
+              icon="log-out-outline"
+              label="Sign Out"
+              value={accountEmail}
+              onPress={handleSignOut}
+              danger
+            />
+          ) : (
+            <SettingsRow
+              icon="log-in-outline"
+              label="Sign In / Sync Account"
+              value={isAuthAvailable() ? 'Sync your verses & journal across devices' : 'Not configured yet'}
+              onPress={() => navigation.navigate('SignIn')}
+            />
+          )}
         </View>
 
         {/* Language & Translation */}
