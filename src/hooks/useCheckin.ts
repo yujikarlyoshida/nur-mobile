@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { submitCheckin as apiSubmitCheckin, ApiError } from '../services/api';
 import { addJournalEntry } from '../services/storage';
+import { getCurrentLocationContext } from '../services/location';
 import { CheckinRequest, CheckinResponse } from '../types';
 
 interface UseCheckinState {
@@ -25,7 +26,12 @@ export function useCheckin(): UseCheckinReturn {
     setState({ loading: true, error: null, result: null });
 
     try {
-      const response = await apiSubmitCheckin(data);
+      // Attach the user's location if we can get it, so the backend can
+      // return activity_suggestions alongside verses. Fails soft to
+      // `null` (permission denied, location off, etc.) — a check-in
+      // without location behaves exactly as it always has.
+      const location = data.location ?? (await getCurrentLocationContext()) ?? undefined;
+      const response = await apiSubmitCheckin({ ...data, location });
 
       // Persist journal entry
       await addJournalEntry({

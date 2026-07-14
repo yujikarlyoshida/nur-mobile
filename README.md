@@ -10,6 +10,7 @@ Backend: [nur-backend](https://github.com/yujikarlyoshida/nur-backend)
 - **React Navigation** (bottom tabs + native stack)
 - **Axios** for API calls, **AsyncStorage** for local persistence
 - **expo-av** for audio playback, **expo-secure-store** for secure storage
+- **expo-location** for optional real-world activity suggestions alongside verses (opt-in — check-ins work fully without location access)
 - **Supabase Auth** for optional cross-device sync (opt-in — the app is fully usable local-only without it)
 - **GitHub Actions** for CI (typecheck + web export build check), **Vercel** for web hosting
 
@@ -17,7 +18,7 @@ Backend: [nur-backend](https://github.com/yujikarlyoshida/nur-backend)
 
 - **Onboarding** — spiritual wellness disclaimer and intro
 - **Home** — mood check-in entry point (mood grid, text, or voice input)
-- **Verse Discovery** — personalized verse recommendations from a check-in
+- **Verse Discovery** — personalized verse recommendations from a check-in, plus real-world activity suggestions ("Something you could do") when location was shared
 - **Verse Detail** — Arabic text, translation, and tafsir summary for a single verse
 - **Journal** — history of past check-ins and saved verses
 - **Sign In** — optional account creation for cross-device sync (reachable from Profile → Account)
@@ -54,3 +55,9 @@ The app works fully offline, no account needed, by default. To turn on optional 
 
 1. Set `supabaseUrl` / `supabaseAnonKey` in `app.json` under `expo.extra` (same Supabase project as the backend — its RLS policies in `db/schema.sql` were already written for this).
 2. That's it — the "Sign In / Sync Account" row appears under Profile → Account automatically once configured (see `src/services/supabaseClient.ts`).
+
+### Optional: real-world activity suggestions
+
+On check-in, the app asks for foreground location permission (see `src/services/location.ts`). If granted, the request to the backend includes coordinates and the response can include `activity_suggestions` — nearby real-world things to do, matched to the detected emotion and time of day, shown under "Something you could do" on the Verse Discovery screen.
+
+If permission is denied, location services are off, or the user is on a platform without location support, this silently does nothing — check-ins behave exactly as before. Nothing to configure on the mobile side; the backend controls whether suggestions come from a sample catalog or a live places API (see the backend README).

@@ -42,6 +42,7 @@ export interface CheckinRequest {
   emotion?: EmotionState;
   language?: string;
   translation_preference?: string;
+  location?: LocationContext;
 }
 
 export interface CheckinResponse {
@@ -52,6 +53,39 @@ export interface CheckinResponse {
     message: string;
     hotlines: Array<{ name: string; number: string; url?: string }>;
   };
+  activity_suggestions?: ActivitySuggestion[];
+}
+
+// ─── Real-World Activity Suggestions ──────────────────────────────────────────
+// Mirrors backend/src/types/index.ts — see activityProvider.service.ts and
+// recommendation.service.ts there for how these get generated.
+
+export type ActivityCategory =
+  | 'calm_nature'
+  | 'physical_release'
+  | 'social_gathering'
+  | 'quiet_reflection'
+  | 'adventure'
+  | 'creative_or_learning'
+  | 'service_or_community'
+  | 'celebration';
+
+export interface LocationContext {
+  latitude: number;
+  longitude: number;
+  timezone?: string;
+}
+
+export interface ActivitySuggestion {
+  id: string;
+  name: string;
+  category: ActivityCategory;
+  description: string;
+  distance_km?: number;
+  typical_hours?: string;
+  is_open_now?: boolean;
+  relevance_score: number;
+  source: 'sample' | 'google_places';
 }
 
 export interface SavedVerse {

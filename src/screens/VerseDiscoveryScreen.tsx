@@ -14,6 +14,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { RootStackParamList, MainTabParamList } from '../navigation/types';
 import { VerseCard } from '../components/VerseCard';
+import { ActivityCard } from '../components/ActivityCard';
 import { EmotionBadge } from '../components/EmotionBadge';
 import { CrisisAlert } from '../components/CrisisAlert';
 import { useSavedVerses } from '../hooks/useSavedVerses';
@@ -217,7 +218,8 @@ export default function VerseDiscoveryScreen() {
     );
   }
 
-  const { emotional_profile, recommendations, crisis_resources } = checkinResponse;
+  const { emotional_profile, recommendations, crisis_resources, activity_suggestions } =
+    checkinResponse;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -275,6 +277,21 @@ export default function VerseDiscoveryScreen() {
 
         {/* Why these verses */}
         <ExpandableReasoning profile={emotional_profile} />
+
+        {/* Real-world activity suggestions (only present if location was shared) */}
+        {activity_suggestions && activity_suggestions.length > 0 && (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Something you could do</Text>
+              <Text style={styles.sectionCount}>
+                {activity_suggestions.length} idea{activity_suggestions.length !== 1 ? 's' : ''}
+              </Text>
+            </View>
+            {activity_suggestions.map((activity) => (
+              <ActivityCard key={activity.id} activity={activity} />
+            ))}
+          </>
+        )}
 
         {/* New check-in FAB area */}
         <View style={styles.newCheckinArea}>

@@ -58,6 +58,7 @@ export async function submitCheckin(data: CheckinRequest): Promise<CheckinRespon
   };
   if (data.text) body['text'] = data.text;
   if (data.emotion) body['mood_selected'] = data.emotion;
+  if (data.location) body['location'] = data.location;
 
   const response = await apiClient.post<CheckinResponse>('/api/checkin', body);
   return response.data;

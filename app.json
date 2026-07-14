@@ -19,7 +19,8 @@
       "bundleIdentifier": "com.nur.quran",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Nur uses your microphone to capture voice check-ins for Quranic guidance.",
-        "NSSpeechRecognitionUsageDescription": "Nur uses speech recognition to transcribe your voice check-ins."
+        "NSSpeechRecognitionUsageDescription": "Nur uses speech recognition to transcribe your voice check-ins.",
+        "NSLocationWhenInUseUsageDescription": "Nur uses your location, only while the app is open, to suggest nearby real-world activities alongside verse recommendations. This is entirely optional — check-ins work fully without it."
       }
     },
     "android": {
@@ -29,7 +30,9 @@
       },
       "package": "com.nur.quran",
       "permissions": [
-        "RECORD_AUDIO"
+        "RECORD_AUDIO",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
       ]
     },
     "web": {
@@ -40,6 +43,12 @@
         "expo-av",
         {
           "microphonePermission": "Allow Nur to access your microphone for voice check-ins."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Nur uses your location, only while the app is open, to suggest nearby real-world activities alongside verse recommendations."
         }
       ]
     ],
