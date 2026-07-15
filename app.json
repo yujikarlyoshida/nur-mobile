@@ -62,7 +62,7 @@
       ]
     ],
     "extra": {
-      "apiBaseUrl": "http://localhost:3000",
+      "apiBaseUrl": "http://nur-backend-prod.eba-2ujhpf2u.us-east-1.elasticbeanstalk.com",
       "supportsRTL": true,
       "supabaseUrl": "",
       "supabaseAnonKey": "",
