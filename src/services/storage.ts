@@ -6,6 +6,7 @@ const KEYS = {
   JOURNAL_ENTRIES: 'nur_journal_entries',
   USER_PROFILE: 'nur_user_profile',
   ONBOARDING_COMPLETE: 'nur_onboarding_complete',
+  DISCLAIMER_ACCEPTED_AT: 'nur_disclaimer_accepted_at',
 } as const;
 
 // ─── Saved Verses ─────────────────────────────────────────────────────────────
@@ -109,6 +110,24 @@ export async function isOnboardingComplete(): Promise<boolean> {
 export async function setOnboardingComplete(): Promise<void> {
   await AsyncStorage.setItem(KEYS.ONBOARDING_COMPLETE, 'true');
   await updateUserProfile({ onboarding_complete: true });
+}
+
+// ─── Liability / Terms Acknowledgement ─────────────────────────────────────────
+//
+// Records when the user checked "I understand and agree" on the onboarding
+// disclaimer step, so there's a local timestamp of acceptance rather than
+// just an implicit "they got past onboarding somehow."
+
+export async function setDisclaimerAccepted(): Promise<void> {
+  await AsyncStorage.setItem(KEYS.DISCLAIMER_ACCEPTED_AT, new Date().toISOString());
+}
+
+export async function getDisclaimerAcceptedAt(): Promise<string | null> {
+  try {
+    return await AsyncStorage.getItem(KEYS.DISCLAIMER_ACCEPTED_AT);
+  } catch {
+    return null;
+  }
 }
 
 // ─── Data Deletion ─────────────────────────────────────────────────────────────

@@ -11,7 +11,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { RootStackParamList } from '../navigation/types';
-import { setOnboardingComplete, updateUserProfile } from '../services/storage';
+import { setOnboardingComplete, updateUserProfile, setDisclaimerAccepted } from '../services/storage';
 import { Colors, Typography, Spacing, BorderRadius, Shadows } from '../constants/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;
@@ -30,10 +30,15 @@ const TRANSLATIONS = [
   { id: 'clear_quran', label: 'The Clear Quran', description: 'Contemporary language (Dr. Khattab)' },
 ];
 
+// Steps: 0 Welcome · 1 How It Works · 2 About Your Location · 3 Preferences · 4 A Note of Care (liability, required)
+const TOTAL_STEPS = 5;
+const LIABILITY_STEP = 4;
+
 export default function OnboardingScreen({ navigation }: Props) {
   const [step, setStep] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'ar' | 'ur' | 'ms'>('en');
   const [selectedTranslation, setSelectedTranslation] = useState('sahih_international');
+  const [hasAcknowledged, setHasAcknowledged] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
 
   const goToStep = (nextStep: number) => {
@@ -42,18 +47,24 @@ export default function OnboardingScreen({ navigation }: Props) {
     setStep(nextStep);
   };
 
+  // "Skip" jumps straight to the required liability/terms step rather than
+  // completing onboarding outright — the one step in this flow that isn't
+  // skippable, since it's the disclaimer users are acknowledging.
+  const handleSkip = () => goToStep(LIABILITY_STEP);
+
   const handleGetStarted = async () => {
     await updateUserProfile({
       language: selectedLanguage,
       translation: selectedTranslation,
     });
+    await setDisclaimerAccepted();
     await setOnboardingComplete();
     navigation.replace('MainTabs');
   };
 
   const renderDots = () => (
     <View style={styles.dots}>
-      {[0, 1, 2].map((i) => (
+      {Array.from({ length: TOTAL_STEPS }, (_, i) => (
         <View
           key={i}
           style={[
@@ -69,9 +80,9 @@ export default function OnboardingScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        {/* Skip button */}
-        {step < 2 && (
-          <TouchableOpacity style={styles.skipButton} onPress={handleGetStarted}>
+        {/* Skip button — hidden on the required liability step */}
+        {step < LIABILITY_STEP && (
+          <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
             <Text style={styles.skipText}>Skip</Text>
           </TouchableOpacity>
         )}
@@ -113,6 +124,81 @@ export default function OnboardingScreen({ navigation }: Props) {
           )}
 
           {step === 1 && (
+            <>
+              <Text style={styles.stepTitle}>How Nur Works</Text>
+              <Text style={styles.stepSubtitle}>A quick walkthrough before you begin</Text>
+              <View style={styles.tutorialList}>
+                {[
+                  {
+                    number: '1',
+                    icon: 'happy-outline',
+                    title: 'Check In',
+                    text: "Tap a mood, write freely, or use voice to describe how you're feeling right now — whatever's easiest.",
+                  },
+                  {
+                    number: '2',
+                    icon: 'book-outline',
+                    title: 'Receive Verses',
+                    text: 'Nur matches your emotional state to relevant Quran verses, each with a short personalized reflection.',
+                  },
+                  {
+                    number: '3',
+                    icon: 'compass-outline',
+                    title: 'Explore & Reflect',
+                    text: 'Save verses you connect with, revisit past check-ins in your Journal, and — if you choose to share your location — see nearby things to do that fit the moment.',
+                  },
+                ].map((item) => (
+                  <View key={item.number} style={styles.tutorialCard}>
+                    <View style={styles.tutorialNumber}>
+                      <Text style={styles.tutorialNumberText}>{item.number}</Text>
+                    </View>
+                    <View style={styles.tutorialContent}>
+                      <View style={styles.tutorialTitleRow}>
+                        <Ionicons name={item.icon as any} size={16} color={Colors.primary} />
+                        <Text style={styles.tutorialTitle}>{item.title}</Text>
+                      </View>
+                      <Text style={styles.tutorialText}>{item.text}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <View style={styles.disclaimerIcon}>
+                <Ionicons name="location-outline" size={44} color={Colors.primary} />
+              </View>
+              <Text style={styles.stepTitle}>About Your Location</Text>
+              <Text style={styles.stepSubtitle}>
+                Nur can optionally suggest real-world things to do nearby — a quiet park, a mosque, a halal-friendly place to eat — matched to how you're feeling.
+              </Text>
+              <View style={styles.infoList}>
+                {[
+                  {
+                    icon: 'checkmark-circle-outline',
+                    text: 'Always optional — check-ins work fully without it, every time.',
+                  },
+                  {
+                    icon: 'time-outline',
+                    text: "Only used in the moment a suggestion is generated — Nur doesn't track or store your location history.",
+                  },
+                  {
+                    icon: 'options-outline',
+                    text: "You'll see a standard permission prompt the first time it's relevant. You can decline, and change your mind anytime from your device Settings.",
+                  },
+                ].map((item) => (
+                  <View key={item.text} style={styles.infoRow}>
+                    <Ionicons name={item.icon as any} size={20} color={Colors.primary} style={styles.infoIcon} />
+                    <Text style={styles.infoText}>{item.text}</Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
+
+          {step === 3 && (
             <>
               <Text style={styles.stepTitle}>Your Preferences</Text>
               <Text style={styles.stepSubtitle}>Choose your language and translation</Text>
@@ -156,7 +242,7 @@ export default function OnboardingScreen({ navigation }: Props) {
             </>
           )}
 
-          {step === 2 && (
+          {step === 4 && (
             <>
               <View style={styles.disclaimerIcon}>
                 <Text style={{ fontSize: 48 }}>☪</Text>
@@ -168,13 +254,25 @@ export default function OnboardingScreen({ navigation }: Props) {
                 </Text>
                 <View style={styles.divider} />
                 <Text style={styles.disclaimerText}>
-                  Always seek qualified Islamic scholars for religious rulings and guidance on matters of faith.
+                  Some content — including personalized reflections and emotional classification — is generated by AI and may occasionally be imperfect. For questions of Islamic rulings (fatwa) or religious guidance, always consult a qualified scholar.
                 </Text>
                 <View style={styles.divider} />
                 <Text style={[styles.disclaimerText, styles.disclaimerImportant]}>
-                  This app is a spiritual wellness tool — not a substitute for professional mental health care. If you are in distress, please reach out to a qualified counsellor or crisis service.
+                  Nur is not a licensed medical, mental health, or religious authority, and is not a substitute for professional care. If you are in distress or experiencing a crisis, please contact a qualified counsellor, crisis service, or emergency services in your area immediately.
                 </Text>
               </View>
+              <TouchableOpacity
+                style={styles.acknowledgeRow}
+                onPress={() => { Haptics.selectionAsync().catch(() => {}); setHasAcknowledged((v) => !v); }}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.checkbox, hasAcknowledged && styles.checkboxChecked]}>
+                  {hasAcknowledged && <Ionicons name="checkmark" size={14} color={Colors.surface} />}
+                </View>
+                <Text style={styles.acknowledgeText}>
+                  I understand and agree to the above.
+                </Text>
+              </TouchableOpacity>
               <View style={styles.bismillah}>
                 <Text style={styles.bismillahAr}>بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</Text>
                 <Text style={styles.bismillahEn}>In the name of Allah, the Most Gracious, the Most Merciful</Text>
@@ -194,7 +292,7 @@ export default function OnboardingScreen({ navigation }: Props) {
             </TouchableOpacity>
           )}
 
-          {step < 2 ? (
+          {step < LIABILITY_STEP ? (
             <TouchableOpacity
               style={styles.nextButton}
               onPress={() => goToStep(step + 1)}
@@ -204,8 +302,9 @@ export default function OnboardingScreen({ navigation }: Props) {
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              style={styles.startButton}
+              style={[styles.startButton, !hasAcknowledged && styles.startButtonDisabled]}
               onPress={handleGetStarted}
+              disabled={!hasAcknowledged}
               activeOpacity={0.85}
             >
               <Text style={styles.startText}>Begin Your Journey</Text>
@@ -311,6 +410,7 @@ const styles = StyleSheet.create({
     fontSize: Typography.fontSize.md,
     color: Colors.textSecondary,
     marginBottom: Spacing.xl,
+    lineHeight: Typography.fontSize.md * 1.5,
   },
   sectionLabel: {
     fontSize: Typography.fontSize.sm,
@@ -387,6 +487,72 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginTop: 2,
   },
+  tutorialList: {
+    gap: Spacing.md,
+  },
+  tutorialCard: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    padding: Spacing.md,
+  },
+  tutorialNumber: {
+    width: 28,
+    height: 28,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tutorialNumberText: {
+    fontSize: Typography.fontSize.sm,
+    color: Colors.surface,
+    fontWeight: Typography.fontWeight.bold,
+  },
+  tutorialContent: {
+    flex: 1,
+  },
+  tutorialTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    marginBottom: 4,
+  },
+  tutorialTitle: {
+    fontSize: Typography.fontSize.md,
+    color: Colors.text,
+    fontWeight: Typography.fontWeight.semibold,
+  },
+  tutorialText: {
+    fontSize: Typography.fontSize.sm,
+    color: Colors.textSecondary,
+    lineHeight: Typography.fontSize.sm * 1.5,
+  },
+  infoList: {
+    gap: Spacing.md,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    padding: Spacing.md,
+    alignItems: 'flex-start',
+  },
+  infoIcon: {
+    marginTop: 2,
+  },
+  infoText: {
+    flex: 1,
+    fontSize: Typography.fontSize.sm,
+    color: Colors.text,
+    lineHeight: Typography.fontSize.sm * 1.55,
+  },
   disclaimerIcon: {
     alignItems: 'center',
     marginBottom: Spacing.xl,
@@ -398,7 +564,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
     ...Shadows.sm,
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
   },
   disclaimerText: {
     fontSize: Typography.fontSize.md,
@@ -413,6 +579,33 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: Colors.divider,
     marginVertical: Spacing.md,
+  },
+  acknowledgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.xl,
+    paddingHorizontal: Spacing.xs,
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: BorderRadius.sm,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.surface,
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  acknowledgeText: {
+    flex: 1,
+    fontSize: Typography.fontSize.sm,
+    color: Colors.text,
+    fontWeight: Typography.fontWeight.medium,
   },
   bismillah: {
     alignItems: 'center',
@@ -491,6 +684,9 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.xl,
     paddingVertical: Spacing.lg,
     gap: Spacing.sm,
+  },
+  startButtonDisabled: {
+    opacity: 0.4,
   },
   startText: {
     fontSize: Typography.fontSize.lg,
