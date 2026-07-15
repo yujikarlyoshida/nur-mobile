@@ -3,6 +3,7 @@
     "name": "Nur - Quranic Wellbeing",
     "slug": "nur-quran",
     "version": "1.0.0",
+    "scheme": "nurquran",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

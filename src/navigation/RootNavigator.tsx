@@ -15,6 +15,8 @@ import VerseDetailScreen from '../screens/VerseDetailScreen';
 import JournalScreen from '../screens/JournalScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SignInScreen from '../screens/SignInScreen';
+import TwoFactorVerifyScreen from '../screens/TwoFactorVerifyScreen';
+import TwoFactorSetupScreen from '../screens/TwoFactorSetupScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -97,6 +99,23 @@ export function RootNavigator({ showOnboarding }: RootNavigatorProps) {
           name="SignIn"
           component={SignInScreen}
           options={{ animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen
+          name="TwoFactorVerify"
+          component={TwoFactorVerifyScreen}
+          options={{ animation: 'slide_from_bottom', gestureEnabled: false }}
+        />
+        <Stack.Screen
+          name="TwoFactorSetup"
+          component={TwoFactorSetupScreen}
+          options={{
+            headerShown: true,
+            headerTitle: '',
+            headerBackTitle: 'Back',
+            headerStyle: { backgroundColor: Colors.background },
+            headerTintColor: Colors.primary,
+            headerShadowVisible: false,
+          }}
         />
         <Stack.Screen
           name="VerseDetail"

@@ -10,6 +10,10 @@ export type RootStackParamList = {
   // params explicitly.
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   SignIn: undefined;
+  TwoFactorVerify: {
+    factorId: string;
+  };
+  TwoFactorSetup: undefined;
   VerseDetail: {
     verse: VerseRecommendation;
     audioUrl?: string;

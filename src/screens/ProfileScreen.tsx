@@ -209,6 +209,21 @@ export default function ProfileScreen() {
           )}
         </View>
 
+        {/* Security */}
+        {accountEmail && (
+          <>
+            <SectionHeader title="Security" icon="shield-checkmark-outline" />
+            <View style={styles.card}>
+              <SettingsRow
+                icon="shield-checkmark-outline"
+                label="Two-Factor Authentication"
+                value="Add an authenticator-app code to sign-in"
+                onPress={() => navigation.navigate('TwoFactorSetup')}
+              />
+            </View>
+          </>
+        )}
+
         {/* Language & Translation */}
         <SectionHeader title="Language & Translation" icon="globe-outline" />
         <View style={styles.card}>
