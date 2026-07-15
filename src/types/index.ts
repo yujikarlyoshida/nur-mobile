@@ -82,6 +82,12 @@ export interface LocationContext {
 // activityProvider.service.ts's estimateVibe() on the backend.
 export type Vibe = 'quiet' | 'moderate' | 'lively';
 
+// How hard parking is likely to be — estimated by the backend (category,
+// time of day, review volume, price level), since there's no free
+// real-time parking-availability API. See
+// activityProvider.service.ts's estimateParkingDifficulty() on the backend.
+export type ParkingDifficulty = 'easy' | 'moderate' | 'hard';
+
 export interface ActivitySuggestion {
   id: string;
   name: string;
@@ -94,6 +100,12 @@ export interface ActivitySuggestion {
   vibe?: Vibe;
   rating?: number;
   review_count?: number;
+  /** Real drive time right now, including current traffic, in minutes. */
+  travel_time_minutes?: number;
+  /** How much longer than free-flow the drive is right now, in minutes. */
+  traffic_delay_minutes?: number;
+  /** Estimated, not measured — see ParkingDifficulty doc comment. */
+  parking_difficulty?: ParkingDifficulty;
   relevance_score: number;
   source: 'sample' | 'google_places';
 }

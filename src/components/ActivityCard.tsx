@@ -25,6 +25,16 @@ const VIBE_LABEL: Record<string, string> = {
   lively: 'Lively',
 };
 
+const PARKING_LABEL: Record<string, string> = {
+  easy: 'Easy',
+  moderate: 'Moderate',
+  hard: 'Hard',
+};
+
+// A delay this small isn't worth calling out — only flag traffic that would
+// actually change whether going is a good idea right now.
+const NOTABLE_TRAFFIC_DELAY_MIN = 5;
+
 export const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
   return (
     <Pressable style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}>
@@ -61,6 +71,38 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
               <Text style={[styles.metaText, styles.specialHoursText]}>· Special hours today</Text>
             )}
           </View>
+          {(activity.travel_time_minutes !== undefined || activity.parking_difficulty) && (
+            <View style={styles.metaRow}>
+              {activity.travel_time_minutes !== undefined && (
+                <Text
+                  style={[
+                    styles.metaText,
+                    (activity.traffic_delay_minutes ?? 0) >= NOTABLE_TRAFFIC_DELAY_MIN &&
+                      styles.trafficDelayText,
+                  ]}
+                >
+                  ~{activity.travel_time_minutes} min drive
+                  {(activity.traffic_delay_minutes ?? 0) >= NOTABLE_TRAFFIC_DELAY_MIN
+                    ? ` (+${activity.traffic_delay_minutes} min traffic)`
+                    : ''}
+                </Text>
+              )}
+              {activity.parking_difficulty && (
+                <Text
+                  style={[
+                    styles.metaText,
+                    activity.parking_difficulty === 'easy'
+                      ? styles.parkingEasyText
+                      : activity.parking_difficulty === 'hard'
+                        ? styles.parkingHardText
+                        : styles.parkingModerateText,
+                  ]}
+                >
+                  · Parking: {PARKING_LABEL[activity.parking_difficulty]}
+                </Text>
+              )}
+            </View>
+          )}
         </View>
       </View>
       <Text style={styles.description} numberOfLines={2}>
@@ -143,6 +185,18 @@ const styles = StyleSheet.create({
   },
   closedText: {
     color: Colors.textTertiary,
+  },
+  trafficDelayText: {
+    color: Colors.warning,
+  },
+  parkingEasyText: {
+    color: Colors.primary,
+  },
+  parkingModerateText: {
+    color: Colors.warning,
+  },
+  parkingHardText: {
+    color: Colors.error,
   },
   description: {
     fontSize: Typography.fontSize.sm,
