@@ -22,7 +22,7 @@ Backend: [nur-backend](https://github.com/yujikarlyoshida/nur-backend)
 - **Verse Discovery** — personalized verse recommendations from a check-in, plus real-world activity suggestions ("Something you could do") when location was shared
 - **Verse Detail** — Arabic text, translation, and tafsir summary for a single verse
 - **Journal** — history of past check-ins and saved verses
-- **Sign In** — optional account creation for cross-device sync via email/password, Google, or phone number (reachable from Profile → Account)
+- **Sign In** — optional account creation for cross-device sync via email/password, Google, or phone number, with a "Continue as Guest" button that skips straight back into the app (reachable from Profile → Account)
 - **Two-Factor Setup** — enable/disable TOTP-based two-factor authentication (reachable from Profile → Security, once signed in)
 - **Profile** — user settings
 
@@ -68,6 +68,8 @@ Sign-in supports three methods, each independently optional — the email/passwo
 - **Phone number** — enable the Phone provider in Supabase and connect an SMS service (Twilio, MessageBird, or Vonage — Supabase's dashboard walks through whichever you pick). This is the one method that costs money per SMS sent, which is why it's not configured by default.
 
 Until a given provider is enabled, that button/tab still renders — it just returns Supabase's "provider not enabled" error instead of crashing, same fail-soft pattern as everything else optional in this app.
+
+The Sign In screen also has a **"Continue as Guest"** button — the app is guest-first by design (see the offline-by-default note above), so this is just an explicit, clearly-labeled way to back out of the sign-in flow instead of hunting for a back button. Profile shows a small "Browsing as Guest" badge under the name whenever no account is signed in, so it's always clear which mode you're in.
 
 ### Optional: two-factor authentication
 

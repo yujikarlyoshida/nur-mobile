@@ -187,6 +187,12 @@ export default function ProfileScreen() {
           </View>
           <Text style={styles.profileName}>{profile?.name || 'Dear Friend'}</Text>
           <Text style={styles.profileTagline}>Nur - Quranic Wellbeing</Text>
+          {!accountEmail && (
+            <View style={styles.guestBadge}>
+              <Ionicons name="person-outline" size={12} color={Colors.textSecondary} />
+              <Text style={styles.guestBadgeText}>Browsing as Guest</Text>
+            </View>
+          )}
         </View>
 
         {/* Account (optional cloud sync) */}
@@ -427,6 +433,21 @@ const styles = StyleSheet.create({
   profileTagline: {
     fontSize: Typography.fontSize.sm,
     color: Colors.textSecondary,
+  },
+  guestBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: Colors.surfaceAlt,
+    borderRadius: BorderRadius.full,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 4,
+    marginTop: Spacing.sm,
+  },
+  guestBadgeText: {
+    fontSize: Typography.fontSize.xs,
+    color: Colors.textSecondary,
+    fontWeight: Typography.fontWeight.medium,
   },
   sectionHeader: {
     flexDirection: 'row',

@@ -322,9 +322,18 @@ export default function SignInScreen({ navigation }: Props) {
             </View>
           )}
 
-          <TouchableOpacity style={styles.skipButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.skipText}>Continue without an account</Text>
+          <TouchableOpacity
+            style={styles.guestButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.85}
+          >
+            <Ionicons name="person-outline" size={16} color={Colors.textSecondary} />
+            <Text style={styles.guestText}>Continue as Guest</Text>
           </TouchableOpacity>
+          <Text style={styles.guestSubtext}>
+            No account needed — everything works fully offline. You can always sign in later from
+            Profile.
+          </Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -480,13 +489,28 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: Typography.fontWeight.medium,
   },
-  skipButton: {
-    marginTop: Spacing.xl,
+  guestButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: Spacing.md,
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    marginTop: Spacing.xl,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    borderRadius: BorderRadius.xl,
+    paddingVertical: Spacing.md,
   },
-  skipText: {
-    fontSize: Typography.fontSize.sm,
+  guestText: {
+    fontSize: Typography.fontSize.md,
     color: Colors.textSecondary,
+    fontWeight: Typography.fontWeight.semibold,
+  },
+  guestSubtext: {
+    fontSize: Typography.fontSize.xs,
+    color: Colors.textTertiary,
+    textAlign: 'center',
+    marginTop: Spacing.sm,
+    lineHeight: Typography.fontSize.xs * 1.6,
+    paddingHorizontal: Spacing.md,
   },
 });
