@@ -18,6 +18,7 @@ import { getUserProfile, updateUserProfile, deleteAllUserData } from '../service
 import { isAuthAvailable, getCurrentUser, signOut } from '../services/auth';
 import { UserProfile } from '../types';
 import { RootStackParamList } from '../navigation/types';
+import { BannerAdSlot } from '../components/BannerAdSlot';
 import { Colors, Typography, Spacing, BorderRadius, Shadows } from '../constants/theme';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -350,6 +351,8 @@ export default function ProfileScreen() {
             onPress={() => Linking.openURL('https://quran.com').catch(() => {})}
           />
         </View>
+
+        <BannerAdSlot />
 
         {/* Disclaimer */}
         <View style={styles.disclaimerCard}>

@@ -51,13 +51,23 @@
         {
           "locationWhenInUsePermission": "Nur uses your location, only while the app is open, to suggest nearby real-world activities alongside verse recommendations."
         }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
+          "userTrackingUsageDescription": "Nur shows a small number of ads to help keep the app free. This lets us show ads that are more relevant to you."
+        }
       ]
     ],
     "extra": {
       "apiBaseUrl": "http://localhost:3000",
       "supportsRTL": true,
       "supabaseUrl": "",
-      "supabaseAnonKey": ""
+      "supabaseAnonKey": "",
+      "admobAndroidBannerId": "ca-app-pub-3940256099942544/6300978111",
+      "admobIosBannerId": "ca-app-pub-3940256099942544/2934735716"
     }
   }
 }

@@ -5,6 +5,7 @@ import { View, StyleSheet, Text, useWindowDimensions, Platform } from 'react-nat
 
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { isOnboardingComplete } from './src/services/storage';
+import { initializeAds } from './src/services/ads';
 import { Colors } from './src/constants/theme';
 
 export default function App() {
@@ -28,6 +29,9 @@ export default function App() {
     }
 
     prepare();
+    // Fire-and-forget: ads SDK init never blocks app startup, and no-ops
+    // on web / in Expo Go without a custom dev client (see ads.ts).
+    initializeAds();
   }, []);
 
   if (!appReady) {

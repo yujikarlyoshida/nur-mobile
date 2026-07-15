@@ -14,6 +14,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { RootStackParamList } from '../navigation/types';
 import { EmotionBadge } from '../components/EmotionBadge';
+import { BannerAdSlot } from '../components/BannerAdSlot';
 import { getJournalEntries } from '../services/storage';
 import { getSavedVerses } from '../services/storage';
 import { JournalEntry, SavedVerse } from '../types';
@@ -245,6 +246,8 @@ export default function JournalScreen() {
                 ))}
               </View>
             )}
+
+            <BannerAdSlot />
           </>
         )}
       </ScrollView>

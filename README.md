@@ -12,6 +12,7 @@ Backend: [nur-backend](https://github.com/yujikarlyoshida/nur-backend)
 - **expo-av** for audio playback, **expo-secure-store** for secure storage
 - **expo-location** for optional real-world activity suggestions alongside verses (opt-in — check-ins work fully without location access)
 - **Supabase Auth** for optional cross-device sync — email/password, Google OAuth, phone number (SMS OTP), and TOTP-based two-factor authentication (all opt-in — the app is fully usable local-only without any of it)
+- **react-native-google-mobile-ads (AdMob)** for banner ads on non-sensitive screens only (see "Ads" below)
 - **GitHub Actions** for CI (typecheck + web export build check), **Vercel** for web hosting
 
 ## Screens
@@ -83,3 +84,23 @@ Every suggestion the mobile app receives is already halal-conscious — the back
 `ActivityCard` also shows, when the backend included them, a real current-traffic drive time (e.g. "~18 min drive (+6 min traffic)", the traffic note only shown once the delay is actually notable) and a color-coded Parking badge (Easy/Moderate/Hard). Both exist so a suggestion doesn't quietly work against the point of suggesting it — the backend already deprioritizes high-traffic, hard-to-park venues in its ranking (see the backend README's traffic and parking section), but showing the numbers lets the user make the final call themselves.
 
 If permission is denied, location services are off, or the user is on a platform without location support, this silently does nothing — check-ins behave exactly as before. Nothing to configure on the mobile side; the backend controls whether suggestions come from a sample catalog or a live places API (see the backend README).
+
+### Ads (AdMob)
+
+Nur shows a single banner ad on two screens: **Journal** (below the check-in history) and **Profile** (above the disclaimer). That's it — this is a deliberate placement policy, not an oversight:
+
+- **Home, Verse Discovery, and Verse Detail never show ads.** Those are the check-in flow, the crisis-resources surface, and scripture reading. Putting ads there would mean monetizing the exact moments the app exists to support, or sitting an ad next to the Quran — both off the table regardless of revenue.
+- **Sign In, Two-Factor, and Onboarding never show ads** — they're not places to introduce a commercial interruption.
+- Journal and Profile are browsing/settings screens — the closest thing this app has to a "neutral" surface — so that's where the one banner lives.
+
+This policy lives in code as much as in this doc: `<BannerAdSlot />` is only imported in `JournalScreen.tsx` and `ProfileScreen.tsx`; there's no generic "ad banner" wired into a shared layout that a future screen could inherit by accident.
+
+**Setup.** `react-native-google-mobile-ads` is a native module — it doesn't run in Expo Go and has no web build. `ads.ts` / `BannerAdSlot.tsx` are the iOS/Android implementation; `ads.web.ts` / `BannerAdSlot.web.tsx` are no-op stubs that Metro resolves instead when building for web, so the native ad SDK is never pulled into the web bundle at all (verified by grepping the exported web bundle for the native module's symbols — absent). To actually see ads, you need a native build via `eas build` or a local prebuild (`npx expo prebuild`) — the plain web/Expo Go dev loop this repo otherwise supports doesn't apply here.
+
+**Test vs. production ad units.** `app.json`'s `react-native-google-mobile-ads` plugin entry and `expo.extra.admobAndroidBannerId` / `admobIosBannerId` currently hold **Google's own public test IDs** (documented at [Test ads — AdMob](https://developers.google.com/admob/android/test-ads)), not real ad inventory. In development (`__DEV__`), `ads.ts` always uses the test banner ID regardless of what's configured, so a debug build can never accidentally request, click, or get billed for a real ad. Before a real release:
+
+1. Create an AdMob account and app entries for iOS/Android, and swap the plugin's `androidAppId` / `iosAppId` in `app.json` for your real ones.
+2. Create banner ad units for each platform and put their IDs in `expo.extra.admobAndroidBannerId` / `admobIosBannerId`.
+3. Rebuild natively (`eas build`) — App IDs are baked into the native manifest at build time, not read at runtime.
+
+**What's not built yet.** A "Pro" tier that removes ads (and a monetization strategy doc covering ad formats/placement tradeoffs/revenue projections in more depth) are deliberately out of scope for this pass — ads were prioritized first. `getBannerAdUnitId()` in `ads.ts` is the single choke point a future paid-tier check would gate (e.g. `isProUser() ? undefined : getBannerAdUnitId()`), so that flag can slot in later without touching the screens.
