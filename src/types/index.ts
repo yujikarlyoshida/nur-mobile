@@ -76,6 +76,12 @@ export interface LocationContext {
   timezone?: string;
 }
 
+// "How busy/energetic" a suggestion is expected to be — estimated by the
+// backend from rating/review volume/price/time-of-day, since Google's
+// public Places API doesn't expose real foot-traffic data. See
+// activityProvider.service.ts's estimateVibe() on the backend.
+export type Vibe = 'quiet' | 'moderate' | 'lively';
+
 export interface ActivitySuggestion {
   id: string;
   name: string;
@@ -84,6 +90,10 @@ export interface ActivitySuggestion {
   distance_km?: number;
   typical_hours?: string;
   is_open_now?: boolean;
+  special_hours_today?: boolean;
+  vibe?: Vibe;
+  rating?: number;
+  review_count?: number;
   relevance_score: number;
   source: 'sample' | 'google_places';
 }

@@ -19,6 +19,12 @@ interface ActivityCardProps {
   activity: ActivitySuggestion;
 }
 
+const VIBE_LABEL: Record<string, string> = {
+  quiet: 'Quiet',
+  moderate: 'Moderate',
+  lively: 'Lively',
+};
+
 export const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
   return (
     <Pressable style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}>
@@ -31,7 +37,14 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
           />
         </View>
         <View style={styles.headerText}>
-          <Text style={styles.name}>{activity.name}</Text>
+          <View style={styles.nameRow}>
+            <Text style={styles.name}>{activity.name}</Text>
+            {activity.vibe && (
+              <View style={styles.vibeBadge}>
+                <Text style={styles.vibeBadgeText}>{VIBE_LABEL[activity.vibe]}</Text>
+              </View>
+            )}
+          </View>
           <View style={styles.metaRow}>
             {activity.distance_km !== undefined && (
               <Text style={styles.metaText}>{activity.distance_km} km away</Text>
@@ -43,6 +56,9 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
               <Text style={[styles.metaText, activity.is_open_now ? styles.openText : styles.closedText]}>
                 · {activity.is_open_now ? 'Open now' : 'Closed now'}
               </Text>
+            )}
+            {activity.special_hours_today && (
+              <Text style={[styles.metaText, styles.specialHoursText]}>· Special hours today</Text>
             )}
           </View>
         </View>
@@ -87,10 +103,30 @@ const styles = StyleSheet.create({
   headerText: {
     flex: 1,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: Spacing.xs,
+  },
   name: {
     fontSize: Typography.fontSize.md,
     color: Colors.text,
     fontWeight: Typography.fontWeight.semibold,
+  },
+  vibeBadge: {
+    backgroundColor: Colors.accentLight,
+    borderRadius: BorderRadius.full,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 2,
+  },
+  vibeBadgeText: {
+    fontSize: 10,
+    color: Colors.primary,
+    fontWeight: Typography.fontWeight.semibold,
+  },
+  specialHoursText: {
+    color: Colors.warning,
   },
   metaRow: {
     flexDirection: 'row',

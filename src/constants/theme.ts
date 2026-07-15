@@ -1,26 +1,30 @@
 import { Platform } from 'react-native';
 
+// "Slate Mint" — minimalist grey/white with deep-emerald green accents.
+// Every screen reads colors from this one file, so this single palette
+// swap re-skins the whole app; see /docs/design-system.md (mobile README)
+// for the rationale and the two variants this was chosen over.
 export const Colors = {
-  primary: '#1B4332',       // deep forest green
-  primaryLight: '#2D6A4F',  // lighter green
-  secondary: '#40916C',     // medium green
-  secondaryLight: '#52B788', // light green
-  accent: '#D4AF37',        // gold
-  accentLight: '#F0D060',   // light gold
-  background: '#F8F4EF',    // warm cream
+  primary: '#14532D',       // deep emerald — primary buttons, active states
+  primaryLight: '#1F7A4D',  // lighter emerald — secondary emphasis
+  secondary: '#1F7A4D',     // medium emerald
+  secondaryLight: '#3B9169', // light emerald
+  accent: '#2FAE6B',        // bright mint — sparing highlight (bookmarks, badges)
+  accentLight: '#DCEFE0',   // pale mint tint for chips/backgrounds
+  background: '#F4F5F5',    // cool light grey (page background)
   surface: '#FFFFFF',       // white surface
-  surfaceAlt: '#F0EBE3',    // slightly warm surface
-  text: '#1C1C1E',          // near-black
-  textSecondary: '#6C6C70', // gray
-  textTertiary: '#AEAEB2',  // light gray
-  textOnPrimary: '#FFFFFF', // white on dark green
-  error: '#FF3B30',         // red
-  warning: '#FF9500',       // orange
-  success: '#34C759',       // green
-  border: '#E5DDD5',        // warm border
-  divider: '#EEE9E3',       // divider
+  surfaceAlt: '#EDEFEE',    // cool light-grey surface
+  text: '#202324',          // near-black, cool undertone
+  textSecondary: '#6B7170', // grey
+  textTertiary: '#9AA0A0',  // light grey
+  textOnPrimary: '#FFFFFF', // white on emerald
+  error: '#E5484D',         // red
+  warning: '#F5A524',       // amber
+  success: '#2FAE6B',       // mint (matches accent — one semantic green)
+  border: '#E2E4E4',        // cool grey border
+  divider: '#E2E4E4',       // divider
   overlay: 'rgba(0,0,0,0.5)',
-  shimmer: '#E8E1D9',
+  shimmer: '#E6E8E8',
 
   // Emotion-specific colors used in MoodSelector
   emotionAnxiety: '#E8A838',

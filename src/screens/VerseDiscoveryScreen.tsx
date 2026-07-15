@@ -198,10 +198,13 @@ function BrowseByEmotion() {
   );
 }
 
+type VibeFilter = 'all' | 'quiet' | 'lively';
+
 export default function VerseDiscoveryScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute();
   const { saveVerse, unsaveVerse, isSaved } = useSavedVerses();
+  const [vibeFilter, setVibeFilter] = useState<VibeFilter>('all');
 
   // Check if we have a checkin response in params
   const params = route.params as { checkinResponse?: CheckinResponse } | undefined;
@@ -279,19 +282,46 @@ export default function VerseDiscoveryScreen() {
         <ExpandableReasoning profile={emotional_profile} />
 
         {/* Real-world activity suggestions (only present if location was shared) */}
-        {activity_suggestions && activity_suggestions.length > 0 && (
-          <>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Something you could do</Text>
-              <Text style={styles.sectionCount}>
-                {activity_suggestions.length} idea{activity_suggestions.length !== 1 ? 's' : ''}
-              </Text>
-            </View>
-            {activity_suggestions.map((activity) => (
-              <ActivityCard key={activity.id} activity={activity} />
-            ))}
-          </>
-        )}
+        {activity_suggestions && activity_suggestions.length > 0 && (() => {
+          const filtered = activity_suggestions.filter((a) => {
+            if (vibeFilter === 'all') return true;
+            if (vibeFilter === 'quiet') return a.vibe === 'quiet' || a.vibe === 'moderate' || !a.vibe;
+            return a.vibe === 'lively' || a.vibe === 'moderate' || !a.vibe;
+          });
+
+          return (
+            <>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Something you could do</Text>
+                <Text style={styles.sectionCount}>
+                  {filtered.length} idea{filtered.length !== 1 ? 's' : ''}
+                </Text>
+              </View>
+
+              <View style={styles.vibeToggleRow}>
+                {(['quiet', 'lively'] as const).map((option) => {
+                  const active = vibeFilter === option;
+                  return (
+                    <TouchableOpacity
+                      key={option}
+                      style={[styles.vibePill, active && styles.vibePillActive]}
+                      onPress={() => setVibeFilter(active ? 'all' : option)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={[styles.vibePillText, active && styles.vibePillTextActive]}>
+                        {option === 'quiet' ? 'Quiet' : 'Lively'}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              {filtered.map((activity) => (
+                <ActivityCard key={activity.id} activity={activity} />
+              ))}
+            </>
+          );
+        })()}
 
         {/* New check-in FAB area */}
         <View style={styles.newCheckinArea}>
@@ -376,6 +406,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,
     borderRadius: BorderRadius.full,
+  },
+  vibeToggleRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  vibePill: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  vibePillActive: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  vibePillText: {
+    fontSize: Typography.fontSize.sm,
+    color: Colors.textSecondary,
+    fontWeight: Typography.fontWeight.medium,
+  },
+  vibePillTextActive: {
+    color: Colors.textOnPrimary,
+    fontWeight: Typography.fontWeight.semibold,
   },
   reasoningCard: {
     backgroundColor: Colors.surface,

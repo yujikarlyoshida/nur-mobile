@@ -27,8 +27,11 @@ Backend: [nur-backend](https://github.com/yujikarlyoshida/nur-backend)
 
 ## Design
 
-- Colors: deep green `#1B4332`, gold `#D4AF37`, cream `#F8F4EF`
-- 13-emotion taxonomy: anxiety, sadness, anger, loneliness, gratitude, hope, guilt, confusion, peace, overwhelmed, grief, disconnection, joy
+"Slate Mint" — a minimalist grey/white/green system, defined centrally in `src/constants/theme.ts` so every screen inherits it:
+
+- Neutrals: background `#F4F5F5`, surface `#FFFFFF`, border `#E2E4E4`, text `#202324` / `#6B7170` / `#9AA0A0`
+- Green: primary/accent emerald `#14532D`, secondary emerald `#1F7A4D`, bright mint accent `#2FAE6B`, mint tint `#DCEFE0` (used for badges like the Quiet/Lively pill)
+- 13-emotion taxonomy: anxiety, sadness, anger, loneliness, gratitude, hope, guilt, confusion, peace, overwhelmed, grief, disconnection, joy (each keeps its own distinct color, unaffected by the palette above)
 - Built-in crisis detection UI — a `CrisisAlert` component renders automatically when a check-in response flags a crisis, surfacing real hotline resources
 - Spiritual wellness tool, not a medical app — disclaimer is part of onboarding
 
@@ -72,5 +75,7 @@ Available once signed in (Profile → Security → Two-Factor Authentication). U
 ### Optional: real-world activity suggestions
 
 On check-in, the app asks for foreground location permission (see `src/services/location.ts`). If granted, the request to the backend includes coordinates and the response can include `activity_suggestions` — nearby real-world things to do, matched to the detected emotion and time of day, shown under "Something you could do" on the Verse Discovery screen.
+
+Each suggestion (`ActivityCard`) can show a rounded `vibe` badge (Quiet / Moderate / Lively), today's regular hours, an open-now indicator, and a "Special hours today" note when the venue's holiday/current hours differ from its usual schedule — all optional fields that only render if the backend included them (live Google Places data only; the sample catalog fills in a baseline `vibe` too). The Verse Discovery screen also shows a Quiet/Lively toggle above the suggestions — tapping a pill filters the already-returned list of up to 6 suggestions client-side (no extra network request); tapping the active pill again clears the filter. See the backend README's "vibe" section for how quiet/moderate/lively is estimated and how a hard server-side filter also exists for other API consumers.
 
 If permission is denied, location services are off, or the user is on a platform without location support, this silently does nothing — check-ins behave exactly as before. Nothing to configure on the mobile side; the backend controls whether suggestions come from a sample catalog or a live places API (see the backend README).
