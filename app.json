@@ -62,10 +62,7 @@
       ]
     ],
     "extra": {
-      "apiBaseUrl": "https://d1mog0qas5zbra.cloudfront.net",
       "supportsRTL": true,
-      "supabaseUrl": "",
-      "supabaseAnonKey": "",
       "admobAndroidBannerId": "ca-app-pub-3940256099942544/6300978111",
       "admobIosBannerId": "ca-app-pub-3940256099942544/2934735716"
     }

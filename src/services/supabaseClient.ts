@@ -9,23 +9,28 @@
 // db/schema.sql (they were written against `auth.uid()` from day one —
 // this is what finally turns them on).
 //
-// Configure via app.json's `expo.extra.supabaseUrl` / `supabaseAnonKey`
-// (see app.json). Until those are set, `isSupabaseConfigured()` returns
-// false and every auth screen shows a clear "not configured" state instead
-// of crashing.
+// Configure via the EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY
+// env vars (see .env.production / .env.example) — not app.json's `expo.extra`,
+// which was found to never actually get embedded in a plain `expo export -p web`
+// build (see api.ts for the full explanation; same underlying issue applies
+// here). Until those env vars are set, `isSupabaseConfigured()` returns false
+// and every auth screen shows a clear "not configured" state instead of
+// crashing.
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
 import 'react-native-url-polyfill/auto';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
 
 function getConfig(): { url: string; anonKey: string } {
-  const extra = Constants.expoConfig?.extra ?? {};
+  // Must stay pure, unwrapped `process.env.EXPO_PUBLIC_X` dot notation on each
+  // line — see the detailed comment on api.ts's API_BASE_URL for exactly why.
   return {
-    url: (extra['supabaseUrl'] as string) ?? '',
-    anonKey: (extra['supabaseAnonKey'] as string) ?? '',
+    // @ts-expect-error EXPO_PUBLIC_SUPABASE_URL is inlined by Metro at build time — not a real ambient ProcessEnv key
+    url: process.env.EXPO_PUBLIC_SUPABASE_URL ?? '',
+    // @ts-expect-error EXPO_PUBLIC_SUPABASE_ANON_KEY is inlined by Metro at build time — not a real ambient ProcessEnv key
+    anonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
   };
 }
 

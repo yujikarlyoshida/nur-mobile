@@ -44,7 +44,15 @@ npm run type-check
 npx expo start        # or: npm run ios / npm run android / npm run web
 ```
 
-Requires the [nur-backend](https://github.com/yujikarlyoshida/nur-backend) API running locally on port 3000 (the app's `api.ts` service defaults to `http://localhost:3000`).
+Requires the [nur-backend](https://github.com/yujikarlyoshida/nur-backend) API running locally on port 3000 (the app's `api.ts` service defaults to `http://localhost:3000` when `EXPO_PUBLIC_API_BASE_URL` isn't set — see "Configuration" below).
+
+### Configuration
+
+`api.ts` and `supabaseClient.ts` read `EXPO_PUBLIC_API_BASE_URL` / `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY` from the environment (see `.env.example`), not from `app.json`'s `expo.extra`. That's a deliberate choice, not a style preference: `Constants.expoConfig.extra` was found to never actually get embedded in a plain `expo export -p web` build — the values were silently absent from the exported bundle no matter what `app.json` said, so the web build always fell back to its hardcoded default regardless of configuration. `EXPO_PUBLIC_*` env vars are inlined into the bundle directly by Metro's babel transform at build time, which works reliably for both native and web.
+
+For local dev, copy values into a `.env` file (gitignored) or leave it unset to use the `localhost:3000` / not-configured defaults. `.env.production` is committed with the real production API URL (safe to commit — see the comment at the top of that file) and is picked up automatically by both `expo export -p web` and `vercel --prod`.
+
+`admobAndroidBannerId` / `admobIosBannerId` are the one exception still read from `app.json`'s `expo.extra` — that's native-only config (`ads.ts` never runs on web, see "Ads" below), where `Constants.expoConfig.extra` works as documented.
 
 ### Web build & deployment
 
@@ -52,13 +60,13 @@ Requires the [nur-backend](https://github.com/yujikarlyoshida/nur-backend) API r
 npm run build:web     # exports a static site to dist/ via Expo's web export
 ```
 
-`vercel.json` is already set up — running `vercel` (or `vercel --prod`) from this directory deploys the web build with no extra config. This gives you a clickable link to the app that doesn't require an App Store install.
+`vercel.json` is already set up — running `vercel` (or `vercel --prod`) from this directory deploys the web build with no extra config, picking up `.env.production` automatically. This gives you a clickable link to the app that doesn't require an App Store install.
 
 ### Optional: cross-device sync (Supabase Auth)
 
 The app works fully offline, no account needed, by default. To turn on optional sign-in and cross-device sync:
 
-1. Set `supabaseUrl` / `supabaseAnonKey` in `app.json` under `expo.extra` (same Supabase project as the backend — its RLS policies in `db/schema.sql` were already written for this).
+1. Set `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY` (same Supabase project as the backend — its RLS policies in `db/schema.sql` were already written for this) — in `.env.production` for the deployed web build, and/or `.env` for local dev.
 2. That's it for email/password — the "Sign In / Sync Account" row appears under Profile → Account automatically once configured (see `src/services/supabaseClient.ts`).
 
 Sign-in supports three methods, each independently optional — the email/password form always works once step 1 above is done; Google and phone need their own provider setup in the Supabase dashboard (Authentication → Providers) before they'll do anything beyond showing an error:
