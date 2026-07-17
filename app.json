@@ -62,7 +62,7 @@
       ]
     ],
     "extra": {
-      "apiBaseUrl": "http://nur-backend-prod.eba-2ujhpf2u.us-east-1.elasticbeanstalk.com",
+      "apiBaseUrl": "https://d1mog0qas5zbra.cloudfront.net",
       "supportsRTL": true,
       "supabaseUrl": "",
       "supabaseAnonKey": "",
